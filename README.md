@@ -1,5 +1,7 @@
 Hi reader,
 
+A GOOD AND RECOMMENDED STARTING POINT IS TO REFER TO THE DOCUMENTATION "PCR_station/PCR_documentation/Covmatic-PCR_API_documentation.pdf" in this repository.
+
 # What is this?
 This repository consists of an API that:
 1)	Allows the user to control the **BioRad CFX96 PCR with C1000 Touch or C1000 thermal cycler**
