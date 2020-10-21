@@ -26,3 +26,5 @@ In brief, the API can be divided into 3 parts:
 3)  Part 3 Interprets the results of the PCR run and consolidates it into a json file. This is done by the **“Data_Processor_App2” project**
 
 A GOOD AND RECOMMENDED STARTING POINT IS TO REFER TO THE DOCUMENTATION **"PCR_station/PCR_documentation/Covmatic-PCR_API_documentation.pdf"** in this repository.
+
+**Please inform us if you discover any bugs in this project by using the "Issues" tab here on GitHub**
