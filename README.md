@@ -1,6 +1,6 @@
 Hi reader,
 
-A GOOD AND RECOMMENDED STARTING POINT IS TO REFER TO THE DOCUMENTATION **"PCR_station/PCR_documentation/Covmatic-PCR_API_documentation.pdf"** in this repository.
+A GOOD AND RECOMMENDED STARTING POINT IS TO REFER TO THE DOCUMENTATION https://github.com/covmatic/PCR_station/blob/main/PCR_Documentation/Covmatic-PCR_API%20documentation.pdf in this repository.
 
 # What is this?
 This repository consists of an API that:
