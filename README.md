@@ -23,4 +23,4 @@ In brief, the API can be divided into 3 parts:
 2)  Part 2 Is the code that controls the PCR. Sends and receives data to and from the PCR. This is achieved by event-driven and status polling architecture
 3)  Part 3 Interprets the results of the PCR run and consolidates it into a json file. This is done by the **“Data_Processor_App2” project**
 
-A GOOD AND RECOMMENDED STARTING POINT IS TO REFER TO THE DOCUMENTATION **"PCR_station/PCR_documentation/Covmatic-PCR_API_documentation.pdf"** in this repositiory.
+A GOOD AND RECOMMENDED STARTING POINT IS TO REFER TO THE DOCUMENTATION **"PCR_station/PCR_documentation/Covmatic-PCR_API_documentation.pdf"** in this repository.
