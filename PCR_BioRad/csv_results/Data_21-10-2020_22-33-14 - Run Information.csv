@@ -1,0 +1,13 @@
+File Name,Data_21-10-2020_22-33-14.pcrd
+Created By User,admin
+Notes,Run from the CFX Manager API service Example Application
+ID,Ciao!
+Run Started,10/21/2020 20:33:35 UTC
+Run Ended,10/21/2020 20:58:28 UTC
+Sample Vol,40
+Lid Temp,105
+Protocol File Name,KHB_4_genes_simulation.prcl
+Plate Setup File Name,KHB_4_genes_plate.pltd
+Base Serial Number,CFX96-SIM00
+Optical Head Serial Number,CFX96-SIM00O
+CFX Maestro Version,4.0.2325.0418. 

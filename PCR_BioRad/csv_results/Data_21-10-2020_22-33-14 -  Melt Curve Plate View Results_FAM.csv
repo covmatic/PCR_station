@@ -1,0 +1,33 @@
+,,1,2,3,4,5,6,7,8,9,10,11,12
+A,Content,Neg Ctrl,Unkn,Unkn,Unkn,Unkn,Unkn,Unkn,Unkn,Unkn,Pos Ctrl,Unkn,Unkn
+A,Sample,,,,,,,,,,,,
+A,Peak 1,,,,,,,,,,,,
+A,Peak 2,,,,,,,,,,,,
+B,Content,Unkn,Unkn,Unkn,Unkn,Unkn,Unkn,Unkn,Unkn,Unkn,Unkn,Unkn,Unkn
+B,Sample,,,,,,,,,,,,
+B,Peak 1,,,,,,,,,,,,
+B,Peak 2,,,,,,,,,,,,
+C,Content,Unkn,Unkn,Unkn,Unkn,Unkn,Unkn,Unkn,Unkn,Unkn,Unkn,Unkn,Unkn
+C,Sample,,,,,,,,,,,,
+C,Peak 1,,,,,,,,,,,,
+C,Peak 2,,,,,,,,,,,,
+D,Content,Unkn,Unkn,Unkn,Unkn,Unkn,Unkn,Unkn,Unkn,Unkn,Unkn,Unkn,Unkn
+D,Sample,,,,,,,,,,,,
+D,Peak 1,,,,,,,,,,,,
+D,Peak 2,,,,,,,,,,,,
+E,Content,Unkn,Unkn,Unkn,Unkn,Unkn,Unkn,Unkn,Unkn,Unkn,Unkn,Unkn,Unkn
+E,Sample,,,,,,,,,,,,
+E,Peak 1,,,,,,,,,,,,
+E,Peak 2,,,,,,,,,,,,
+F,Content,Unkn,Unkn,Unkn,Unkn,Unkn,Unkn,Unkn,Unkn,Unkn,Unkn,Unkn,Unkn
+F,Sample,,,,,,,,,,,,
+F,Peak 1,,,,,,,,,,,,
+F,Peak 2,,,,,,,,,,,,
+G,Content,Unkn,Unkn,Unkn,Unkn,Unkn,Unkn,Unkn,Unkn,Unkn,Unkn,Unkn,Unkn
+G,Sample,,,,,,,,,,,,
+G,Peak 1,,,,,,,,,,,,
+G,Peak 2,,,,,,,,,,,,
+H,Content,Unkn,Unkn,Unkn,Unkn,Unkn,Unkn,Unkn,Unkn,Unkn,Unkn,Unkn,Unkn
+H,Sample,,,,,,,,,,,,
+H,Peak 1,,,,,,,,,,,,
+H,Peak 2,,,,,,,,,,,,
