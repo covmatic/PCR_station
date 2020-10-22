@@ -1,4 +1,5 @@
 Here is a list of documentations supporting the BioRad API. The user / programmer is suggested to start from the **Covmatic-PCR_API_documentation.pdf**
+
 1 -   **BioRad_C1000_Touch.pdf:** BioRad documentation on the _C1000 Touch_ hardware. Refer this if you are using the BioRad _C1000 Touch_ thermal cycler.
 
 1 -   **BioRad-C1000.pdf:** BioRad documentation on the _C1000_ hardware. Refer this if you are using the BioRad _C1000_ thermal cycler.
