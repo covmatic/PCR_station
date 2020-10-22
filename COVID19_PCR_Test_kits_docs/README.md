@@ -4,4 +4,4 @@ The documents in this folder describe the COVID-19 testing procedure. These docu
 
 All of these test kits are supported by the BioRad API v1.4. By default, the API assumes that the **KHB test kit** is used.
 
-Refer to the documentation in PCR/
+Refer to the documentation in the following link to understand about test kits:
