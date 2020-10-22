@@ -11,7 +11,7 @@ This repository consists of an API that:
   The **Covmatic** digital webserver then reconciles the contents of each well in the 96-well PCR plate to the patient from whom the sample was extracted.
 The code for this BioRad API is **written in C# following the .NET framework**. The API communicates with the BioRad PCR machine (via the BioRad application, CFX Manager/Maestro) by exchanging XML files (via USB serial connection) that follow a defined schema.
 
-This API can be run from the **Covmatic Webserver**, or it can also be run as a **standalone application**. If you run it from the Covmatic webserver, then the JSON file generated at the end of the PCR run will be picked up by the server and stored in the Covmatic digital records.
+This API can be run from the local **Covmatic Webserver**, or it can also be run as a **standalone application**. If you run it from the Covmatic Webserver, then the JSON file generated at the end of the PCR run will be picked up by the server and stored in the Covmatic digital records.
 
 # Why is this?
 Imagine that you insert a 96-well plate into a PCR. These wells are labeled A1,A2, A3, B1, B2, B3 …, etc. Now, of course it has 96 samples all from different patients. Inside the PCR, the samples undergo a thermo-chemical reaction. The PCR captures the status of this reaction at regular time intervals and generates reaction curves for each well.
