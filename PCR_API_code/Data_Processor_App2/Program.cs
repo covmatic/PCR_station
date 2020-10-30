@@ -1241,7 +1241,7 @@ namespace PCR_Data_Processor
                                 aWell.test_call = "Inconclusive";
                             break;
                         case 1:
-                            aWell.test_call = "Inconclusive";
+                            aWell.test_call = "(-) neg";
                             break;
                         case 2:
                             aWell.test_call = "(+) POSITIVE";
