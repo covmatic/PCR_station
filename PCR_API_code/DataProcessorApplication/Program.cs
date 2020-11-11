@@ -16,7 +16,6 @@ namespace DataProcessorApplication
         {
             string baseFileName = "";
             string outPCRSerial = "";
-            DataProcess.process_data(outPCRSerial, baseFileName);
 
             void help()
             {
