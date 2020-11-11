@@ -29,7 +29,7 @@ namespace PCR_Data_Processor
     {
         // Set all the samples to "Inconclusive" if at least one
         // of the positive control or negative control fails
-        public const bool SetInconclusiveIfControlsFail = true;
+        public const bool SetInconclusiveIfControlsFail = false;
     }
 
     class Data_PrimerDesign
