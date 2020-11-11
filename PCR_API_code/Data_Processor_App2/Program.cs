@@ -24,6 +24,14 @@ using Newtonsoft.Json;
 
 namespace PCR_Data_Processor
 {
+    /* module settings for analysis*/
+    class AnalysisSettings
+    {
+        // Set all the samples to "Inconclusive" if at least one
+        // of the positive control or negative control fails
+        public const bool SetInconclusiveIfControlsFail = true;
+    }
+
     class Data_PrimerDesign
     {
         public string labName, username, plateBarcode, pcrSerial, runDate, runTime, testKitName;
@@ -1223,8 +1231,11 @@ namespace PCR_Data_Processor
                     aWell.roxRFU_points[i] = Convert.ToSingle(ROXtable.Rows[i][count + 2]);
                 }
                 //-----test call logic for each well - by default, the well sample is considered a "(-) neg"
-                if (control.NECresult == "FAIL" || control.PCTresult == "FAIL")
+                if (AnalysisSettings.SetInconclusiveIfControlsFail &&
+                    (control.NECresult == "FAIL" || control.PCTresult == "FAIL"))
+                {
                     aWell.test_call = "Inconclusive";
+                }
                 else
                 {
                     count1 = 0;
