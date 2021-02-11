@@ -1,1 +1,10 @@
-PCR_API_code\DataProcessorApplication\bin\*
+PCR_API_code/DataProcessorApplication/bin/
+PCR_API_code/DataProcessorApplication/obj/
+PCR_API_code/Data_Processor_App2/bin/
+PCR_API_code/Data_Processor_App2/obj/
+PCR_API_code/Source/Example_Client/obj/
+PCR_API_code/Source/Example_Client/bin/
+PCR_API_code/Source/Example_Application/obj/
+PCR_API_code/Source/Example_Application/bin/
+PCR_API_code/Source/Example_Client_Wrapper/obj/
+PCR_API_code/Source/Example_Client_Wrapper/bin/
