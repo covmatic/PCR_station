@@ -249,6 +249,9 @@ namespace PCR_Data_Processor
                     qua670Check = true;
             }
 
+            // Setting culture info for reading numbers correctly with the Convert class
+            CultureInfo.CurrentCulture = CultureInfo.InvariantCulture;
+
             if (hexCheck && famCheck && roxCheck && cy5Check)
                 process_data_KHB(PCRserial, outputFileName);
             else if (hexCheck && famCheck && cr610Check && qua670Check)
