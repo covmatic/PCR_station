@@ -84,7 +84,6 @@ namespace BioRad.Example_Application
         ///Used as a mutual-exclusion lock during status updates<remarks/>
         object m_update_status_lock = new object();
         private bool m_update_status_running = false;
-        object m_task_syncronizing_object = new object();
 
 
         /// Flag used to skip status updates when the user is repositioning the application window<remarks/>
@@ -230,11 +229,6 @@ namespace BioRad.Example_Application
         private void ExampleMainForm_ResizeEnd(object sender, EventArgs e)
         {
             m_UI_IsBusy = false;
-        }
-
-        private void UpdateTimer_Elapsed_Thread(object o)
-        {
-            Console.WriteLine("Thread timer called on thread: " + Thread.CurrentThread.ManagedThreadId);
         }
 
         /// <summary>
