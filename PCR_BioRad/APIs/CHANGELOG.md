@@ -1,5 +1,8 @@
 # PCR API for Biorad CFX Maestro
 
+## v1.6.2 2021-08-19
+### Fixed
+- Inserted queue for not overlapping status update while sending protocol.
 
 ## v1.6.1 2021-08-18
 ### Fixed

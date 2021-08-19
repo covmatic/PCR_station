@@ -252,8 +252,8 @@ namespace BioRad.Example_Client_Wrapper
                 new_process.StartInfo.RedirectStandardOutput = false;
                 new_process.EnableRaisingEvents = true;
                 new_process.StartInfo.FileName = m_CFXManagerExecutable;
-                new_process.StartInfo.Arguments = string.Format("-startup");   //To run on actual machine: FOR RELEASE
-                //new_process.StartInfo.Arguments = string.Format("-simulation"); //To run a PCR simulation {Edit:Aff23Jun2020}
+                new_process.StartInfo.Arguments = string.Format(" -startup");   //To run on actual machine: FOR RELEASE
+                //new_process.StartInfo.Arguments += string.Format(" -simulation"); //To run a PCR simulation {Edit:Aff23Jun2020}
                 new_process.Start();
                 m_executing_cfx_manager_process = new_process;
                 int max_attempts = 20;
