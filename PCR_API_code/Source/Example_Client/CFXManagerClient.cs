@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.ServiceModel;
 
 namespace BioRad.Example_Client
@@ -16,7 +17,6 @@ namespace BioRad.Example_Client
     /// </summary>
     public static class CFXManagerClient
     {
-
         #region call-back place-holder
 
         /// <summary>
@@ -35,6 +35,23 @@ namespace BioRad.Example_Client
         }
 
         #endregion
+
+        /// <summary>
+        /// Log function
+        /// </summary>
+        /// <param name="logMessage"></param>
+        /// <param name="filename"></param>
+        private static void Log(string logMessage, string filename = "log.txt")
+        {
+            using (StreamWriter w = File.AppendText(filename))
+            {
+                w.Write("\r\nLog Entry : ");
+                w.WriteLine($"{DateTime.Now.ToLongTimeString()} {DateTime.Now.ToLongDateString()}");
+                w.WriteLine("  :");
+                w.WriteLine($"  :{logMessage}");
+                w.WriteLine("-------------------------------");
+            }
+        }
 
         #region Member Data
 
@@ -57,6 +74,7 @@ namespace BioRad.Example_Client
         /// </param>
         public static void SetResponseTimeOut(int time_out_seconds)
         {
+            Log("Timeout set to: " + time_out_seconds);
             m_Client.InnerChannel.OperationTimeout = TimeSpan.FromSeconds(time_out_seconds);
         }
 
@@ -100,6 +118,8 @@ namespace BioRad.Example_Client
             return false;
         }
 
+        private static int id = 0;
+
         /// <summary>
         /// Send a service request
         /// </summary>
@@ -107,7 +127,13 @@ namespace BioRad.Example_Client
         /// <returns>An xml service response message conforming to the API schema </returns>
         public static string SendServiceRequest(string request)
         {
-            return m_Client.XmlCommand(request);
+            string ret;
+            
+            Log(String.Format("Sending request {0}: {1}", id, request));
+            ret = m_Client.XmlCommand(request);
+            Log(String.Format("Got answer {0}: {1}", id, ret));
+            id++;
+            return ret;
         }
 
         #endregion
