@@ -701,8 +701,8 @@ namespace BioRad.Example_Application
                             }
                         }
                     }
-                    m_OP_InProgress = false;
                 }
+                m_OP_InProgress = false;
             }
         }
 
