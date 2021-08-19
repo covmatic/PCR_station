@@ -14,7 +14,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Diagnostics;
 using PCR_Data_Processor;
-
+using System.Collections;
 
 namespace BioRad.Example_Application
 {
@@ -83,6 +83,9 @@ namespace BioRad.Example_Application
 
         ///Used as a mutual-exclusion lock during status updates<remarks/>
         object m_update_status_lock = new object();
+        private bool m_update_status_running = false;
+        object m_task_syncronizing_object = new object();
+
 
         /// Flag used to skip status updates when the user is repositioning the application window<remarks/>
         bool m_UI_IsBusy = false;
@@ -96,6 +99,10 @@ namespace BioRad.Example_Application
         static int count = 0; // This is a user defined variable. NOT FROM BIO-RAD API. It solves the problem for startrunform
                               // pop-up form opening twice during a run
 
+        static string ui_log_filename = "";
+
+        Queue action_queue = new Queue();
+
         #endregion
 
         #region Construction and Initialization
@@ -106,6 +113,7 @@ namespace BioRad.Example_Application
         /// </summary>
         public MainForm()
         {
+            ui_log_filename = DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss") + "_log_ui.txt";
             InitializeComponent();
             InitializeMainForm();
         }
@@ -165,7 +173,6 @@ namespace BioRad.Example_Application
                 m_status_update_timer.AutoReset = true;
                 m_status_update_timer.Start();
             };
-
             #endregion
 
             // InitializeMainForm() Entry Point
@@ -225,6 +232,11 @@ namespace BioRad.Example_Application
             m_UI_IsBusy = false;
         }
 
+        private void UpdateTimer_Elapsed_Thread(object o)
+        {
+            Console.WriteLine("Thread timer called on thread: " + Thread.CurrentThread.ManagedThreadId);
+        }
+
         /// <summary>
         /// System Timer Elapsed - Set during initialization to occur every 1 second. Perform an update of the status grid if
         /// the user is not attempting to move the application window, and if no non-status API operation requests are in progress.
@@ -233,39 +245,64 @@ namespace BioRad.Example_Application
         /// <param name="e"></param>
         private void UpdateTimer_Elapsed(object sender, EventArgs e)
         {
+            Log("Timer elapsed on thread: " + Thread.CurrentThread.ManagedThreadId);
             lock (m_update_status_lock)
             {
-                // Do not process events that arrive after the timer has been disabled
-                if (m_status_update_timer.Enabled)
+                if (!m_update_status_running)
                 {
-                    // Do not process events that arrive while the window is being moved, or a non-status API operation request is in progress
-                    if (!m_UI_IsBusy && !m_OP_InProgress)
+                    m_update_status_running = true;
+                    Log("Entered :-)");
+                    // Do not process events that arrive after the timer has been disabled
+                    if (m_status_update_timer.Enabled)
                     {
-                        if (!m_am_connected)
+                        // Do not process events that arrive while the window is being moved, or a non-status API operation request is in progress
+                        if (!m_UI_IsBusy && !m_OP_InProgress)
                         {
-                            //try to reestablish the client connection if it has been lost
-                            if (m_ClientWrapper.OpenClient())
+                            if (!m_am_connected)
                             {
-                                LogNewLine(string.Format("The client has reestablished connectivity with the CFX Manager API service."));
-                                m_am_connected = true;
-                                this.m_status_update_timer.Interval = c_status_update_interval;
-                                m_panel_buttons.Enabled = true;
+                                //try to reestablish the client connection if it has been lost
+                                if (m_ClientWrapper.OpenClient())
+                                {
+                                    LogNewLine(string.Format("The client has reestablished connectivity with the CFX Manager API service."));
+                                    m_am_connected = true;
+                                    this.m_status_update_timer.Interval = c_status_update_interval;
+                                    m_panel_buttons.Enabled = true;
+                                }
+                            }
+                            if (m_ClientWrapper.ClientIsConnected())
+                            {
+                                List<CFXManagerClientWrapper.InstrumentStatus> status_list = m_ClientWrapper.GetInstrumentStatus();
+                                UpdateStatus(status_list, false);
+                            }
+                            else if (m_am_connected)
+                            {
+                                m_am_connected = false;
+                                this.m_status_update_timer.Interval = c_connect_retry_interval;
+                                m_panel_buttons.Enabled = false;
+                                LogNewLine(string.Format("The client has lost connectivity with the CFX Manager API service."));
+                                UpdateStatus(null);
                             }
                         }
-                        if (m_ClientWrapper.ClientIsConnected())
+                    }
+                    while (action_queue.Count > 0)
+                    {
+                        Log("Dequeing!! Count = " + action_queue.Count);
+                        var action = action_queue.Dequeue();
+                        switch (action)
                         {
-                            List<CFXManagerClientWrapper.InstrumentStatus> status_list = m_ClientWrapper.GetInstrumentStatus();
-                            UpdateStatus(status_list, false);
-                        }
-                        else if (m_am_connected)
-                        {
-                            m_am_connected = false;
-                            this.m_status_update_timer.Interval = c_connect_retry_interval;
-                            m_panel_buttons.Enabled = false;
-                            LogNewLine(string.Format("The client has lost connectivity with the CFX Manager API service."));
-                            UpdateStatus(null);
+                            case "RunProtocol":
+                                RunProtocol();
+                                break;
+                            default:
+                                throw new Exception("Action not found: " + action);
                         }
                     }
+                    m_update_status_running = false;
+                    Log("Timer ended!");
+                }
+                else
+                {
+                    Log("Skipped!");
                 }
             }
         }
@@ -663,8 +700,15 @@ namespace BioRad.Example_Application
         /// <param name="e"></param>
         private void m_button_RunProtocol_Click(object sender, EventArgs e)
         {
+            action_queue.Enqueue("RunProtocol");
+            Log("RunProtocol Enqueued!");
+        }
+
+        private void RunProtocol()
+        {
             lock (m_update_status_lock)
             {
+                Log("Run protocol entered :-)");
                 //Turn off timer-triggered status updates during the operation(s)
                 m_OP_InProgress = true;
                 if (!AnyInstrumentsSelected())
@@ -704,6 +748,7 @@ namespace BioRad.Example_Application
                 }
                 m_OP_InProgress = false;
             }
+            Log("RunProtocol ended!");
         }
 
         /// <summary>
@@ -794,9 +839,31 @@ namespace BioRad.Example_Application
             m_richTextBox_display.Text += message + "\n";
             m_richTextBox_display.SelectionStart = m_richTextBox_display.Text.Length;
             m_richTextBox_display.ScrollToCaret();
+            Log(message, ui_log_filename);
         }
 
         #endregion
+
+
+        /// <summary>
+        /// Log function
+        /// </summary>
+        /// <param name="logMessage"></param>
+        /// <param name="filename"></param>
+        private static void Log(string logMessage, string filename = "log_ui.txt")
+        {
+            if (filename != "")
+            {
+                using (StreamWriter w = File.AppendText(filename))
+                {
+                    w.Write("\r\nLog Entry : ");
+                    w.WriteLine($"{DateTime.Now.ToLongTimeString()} {DateTime.Now.ToLongDateString()}");
+                    w.WriteLine("  :");
+                    w.WriteLine($"  :{logMessage}");
+                    w.WriteLine("-------------------------------");
+                }
+            }
+        }
 
         #region Cleanup
 
