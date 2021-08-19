@@ -1,0 +1,517 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>BioRad.Example_Application</name>
+    </assembly>
+    <members>
+        <member name="T:BioRad.Example_Application.MainForm">
+            <summary>
+            Copyright ©2014 Bio-Rad Laboratories, Inc. All rights reserved.
+            
+            This class is part of the CFX Manager API Examples kit. 
+            
+            Implements demonstration application-layer logic using the CFXManagerClientWrapper class as 
+            middleware to communicate with the CFX Manager API Service. Demonstrates the use of the
+            most commonly utilized CFX Manager API operations and provides an example of how to use 
+            instrument status polling to monitor and manage the operation of multiple instruments
+            simultaneously.
+            
+            Performs CFX Manager version checking. If a compatible version of CFX Manager is running in 
+            User Mode when the applications is started, it will establish a client connection with that
+            instance of CFX Manager. If CFX Manager is not running when the application is started, it
+            will start a Server Mode instance of CFX manager and establish a client connection with 
+            that instance.
+            
+            Maintains a table of currently connected instruments and pertinent status metrics. Applies
+            API operations to all currently selected instruments. Logs instrument operational status
+            changes and operation status change interpretations to a TextBox console.
+            </summary>
+        </member>
+        <member name="F:BioRad.Example_Application.MainForm.c_app_name">
+            The application name that will appear on the title bar of the Main Form<remarks/>
+        </member>
+        <member name="F:BioRad.Example_Application.MainForm.c_status_update_interval">
+            The interval in milliseconds at which to fire the system timer used to trigger status updates<remarks/>
+        </member>
+        <member name="F:BioRad.Example_Application.MainForm.c_connect_retry_interval">
+            The interval in milliseconds at which to fire the system timer when attempting to reconnect to the service<remarks/>
+        </member>
+        <member name="F:BioRad.Example_Application.MainForm.m_ClientWrapper">
+            <remarks>
+            The CFXManagerClientWrapper object that serves as middleware between this application and
+            the CFX Manager API Service.
+            </remarks>
+        </member>
+        <member name="F:BioRad.Example_Application.MainForm.m_status_update_timer">
+            <remarks>
+            The system timer used to trigger regular instrument status updates while the application is  
+            connected to the CFX Manager API service. 
+            </remarks>
+        </member>
+        <member name="F:BioRad.Example_Application.MainForm.m_detected_cyclers">
+            <remarks>
+            A list of all cyclers that have been detected since the application was started. Used to
+            recognize if an instrument becomes disconnected/reconnected after being detected.
+            </remarks>
+        </member>
+        <member name="F:BioRad.Example_Application.MainForm.m_StartRunForm">
+             <remarks>
+            The windows form used to collect the parameters required to start a PCR run via the
+            CFX Manager API service. 
+             </remarks>
+        </member>
+        <member name="F:BioRad.Example_Application.MainForm.m_update_status_lock">
+            Used as a mutual-exclusion lock during status updates<remarks/>
+        </member>
+        <member name="F:BioRad.Example_Application.MainForm.m_UI_IsBusy">
+            Flag used to skip status updates when the user is repositioning the application window<remarks/>
+        </member>
+        <member name="F:BioRad.Example_Application.MainForm.m_OP_InProgress">
+            Flag used to skip status updates when a non-status API operation request is in progress<remarks/>
+        </member>
+        <member name="F:BioRad.Example_Application.MainForm.m_am_connected">
+            Flag used to track connectivity between the client and the CFX Manager API service<remarks/>
+        </member>
+        <member name="M:BioRad.Example_Application.MainForm.#ctor">
+            <summary>
+            MainForm constructor. Call InitializeComponent() as required for Designer support, then call 
+            InitializeMainForm() to perform application-specific initialization.
+            </summary>
+        </member>
+        <member name="M:BioRad.Example_Application.MainForm.InitializeMainForm">
+            <summary>
+            Initialize the example application. If a compatible version of CFX Manager is executing, establish a connection
+            with it, otherwise start CFX Manager in server (no UI) mode and establish a connection with that instance. 
+            Subscribe to the ClientError event published by the client wrapper. Initialize local member data. Present an
+            explanatory dialog and exit the application if no compatible version of CFX Manager is installed on the host machine,
+            or if the client fails for any reason to establish a connection with the CFX Manager API service.
+            </summary>
+        </member>
+        <member name="M:BioRad.Example_Application.MainForm.ExampleMainForm_ResizeBegin(System.Object,System.EventArgs)">
+            <summary>
+            If the mouse clicks on the form border (to re-size, move, or close)
+            disable timer-fired status updates by setting UI_IsBusy to true
+            </summary>
+            <param name="sender"></param>
+            <param name="e"></param>
+        </member>
+        <member name="M:BioRad.Example_Application.MainForm.ExampleMainForm_ResizeEnd(System.Object,System.EventArgs)">
+            <summary>
+            When a form border mouse click is released, resume timer-fired status updates
+            by setting UI_IsBusy to false
+            </summary>
+            <param name="sender"></param>
+            <param name="e"></param>
+        </member>
+        <member name="M:BioRad.Example_Application.MainForm.UpdateTimer_Elapsed(System.Object,System.EventArgs)">
+            <summary>
+            System Timer Elapsed - Set during initialization to occur every 1 second. Perform an update of the status grid if
+            the user is not attempting to move the application window, and if no non-status API operation requests are in progress.
+            </summary>
+            <param name="sender"></param>
+            <param name="e"></param>
+        </member>
+        <member name="M:BioRad.Example_Application.MainForm.UpdateStatus(System.Collections.Generic.List{BioRad.Example_Client_Wrapper.CFXManagerClientWrapper.InstrumentStatus},System.Boolean)">
+            <summary>
+            Process the specified list of instrument status objects. Update the status grid to reflect the current status 
+            of all included intruments. Report any errors associated with the included instruments. If the is_op_response
+            parameter is false, perform new and disconnected instrument detection.
+            </summary>
+            <param name="status_list">A List of InstrumentStatus objects to be processed </param>
+            <param name="is_op_response">
+            If true, assume the update is a single instrument status recieved in response to a basic API operation request
+            (Do not perform instrument disconnection detection logic). If false, process as an all-instruments status update, 
+            and include new and disconnected instrument detection logic. True by default.
+            </param>
+        </member>
+        <member name="M:BioRad.Example_Application.MainForm.ProcessStatusChange(System.String,System.String,System.String)">
+            <summary>
+            Analyze and report on the given status change for the specified instrument. Called when an instrument's status is updated. 
+            In addition to reporting the specified status change, this method infers and reports on certain high-level workflow 
+            events such as the starting or ending of protocols based on their unique status-transition signatures.
+            </summary>
+            <param name="serial_number">The instrument serial number</param>
+            <param name="previous_status">The previously detected instrument status</param>
+            <param name="current_status">The newly detetcted instrumenst status</param>
+        </member>
+        <member name="M:BioRad.Example_Application.MainForm.AnyInstrumentsSelected">
+            <summary>
+            Checks that at least one instrument is selected in the status grid. Called prior to 
+            attempting to execute button triggered operation requests to enable the calling methods 
+            to log the case where there are no selected instruments and no operation can be requested. 
+            </summary>
+            <returns>true IFF at least one instrument is selected in the status grid</returns>
+        </member>
+        <member name="M:BioRad.Example_Application.MainForm.RequestOfAllSelectedCyclers(System.Func{System.String,System.Collections.Generic.List{BioRad.Example_Client_Wrapper.CFXManagerClientWrapper.InstrumentStatus}})">
+            <summary>
+            Used to execute basic instrument operation requests that require just the instrument serial
+            number as a parameter. Executes the specified operation request delegate against all cyclers 
+            that are currently selected in the status grid.
+            </summary>
+            <param name="request">
+            Any of the API request methods defined in CFXManagerClientWrapper class that require only the 
+            instrument serial number as a parameter.
+            </param>
+        </member>
+        <member name="M:BioRad.Example_Application.MainForm.m_button_Blink_Click(System.Object,System.EventArgs)">
+            <summary>
+            The Blink button was clicked.
+            Blink the LED of all cyclers that are checked in the status grid
+            </summary>
+            <param name="sender"></param>
+            <param name="e"></param>
+        </member>
+        <member name="M:BioRad.Example_Application.MainForm.m_button_Open_Click(System.Object,System.EventArgs)">
+            <summary>
+            The Open Lid button was clicked.
+            Open the lids of all cyclers that are checked in the status grid
+            </summary>
+            <param name="sender"></param>
+            <param name="e"></param>
+        </member>
+        <member name="M:BioRad.Example_Application.MainForm.m_button_Close_Click(System.Object,System.EventArgs)">
+            <summary>
+            The Close Lid button was clicked.
+            Close the lids of all cyclers that are checked in the status grid
+            </summary>
+            <param name="sender"></param>
+            <param name="e"></param>
+        </member>
+        <member name="M:BioRad.Example_Application.MainForm.m_button_GenerateReport_Click(System.Object,System.EventArgs)">
+            <summary>
+            The Generate Report button was clicked.
+            Use the API GenerateReport operation to generate a PDF report of a user selected
+            data file, using the default CFX Manager report template. The report will be written 
+            to the same directory as the selected data file. If a report file of the same name
+            already exists at that location, it will be overridden with the newly generated report. 
+            </summary>
+            <param name="sender"></param>
+            <param name="e"></param>
+        </member>
+        <member name="M:BioRad.Example_Application.MainForm.m_button_RunProtocol_Click(System.Object,System.EventArgs)">
+            <summary>
+            The Start Run button was clicked.
+            For each selected instrument on the status grid, display the StartRun form to collect the parameters required.
+            for the RunProtocol operation, and call the client wrappers RunProtocol method using the collected parameters.
+            </summary>
+            <param name="sender"></param>
+            <param name="e"></param>
+        </member>
+        <member name="M:BioRad.Example_Application.MainForm.m_button_PauseRun_Click(System.Object,System.EventArgs)">
+            <summary>
+            The Pause Run button was clicked.
+            Send a PauseRun request to all cyclers that are checked in the status grid
+            </summary>
+            <param name="sender"></param>
+            <param name="e"></param>
+        </member>
+        <member name="M:BioRad.Example_Application.MainForm.m_button_ResumeRun_Click(System.Object,System.EventArgs)">
+            <summary>
+            The Resume Run button was clicked.
+            Send a ResumeRun request to all cyclers that are checked in the status grid
+            </summary>
+            <param name="sender"></param>
+            <param name="e"></param>
+        </member>
+        <member name="M:BioRad.Example_Application.MainForm.m_button_StopRun_Click(System.Object,System.EventArgs)">
+            <summary>
+            The Stop Run button was clicked.
+            Send a StopRun request to all cyclers that are checked in the status grid
+            </summary>
+            <param name="sender"></param>
+            <param name="e"></param>
+        </member>
+        <member name="M:BioRad.Example_Application.MainForm.HandleClientError(System.Object,BioRad.Example_Client_Wrapper.CFXManagerClientWrapper.ClientErrorEventArgs)">
+            <summary>
+            Report errors generated by the API client. Most client generated errors are not expected during
+            normal operation and reflect serious and/or unrecoverable issues. However, certain client errors, such as
+            exceptions on service response time-outs or on attempts to open the client when the service is not listening
+            can be expected to occur under anticipated circumstances in most applications, and should be ignored 
+            or otherwise processed as recoverable errors. Here, failed attempts to open the client when the
+            service is not running are ignored in order to allow the application to reconnect if CFX Manager
+            is closed and then re-opened while the application is running.
+            </summary>
+            <param name="sender"></param>
+            <param name="e"></param>
+        </member>
+        <member name="M:BioRad.Example_Application.MainForm.LogNewLine(System.String)">
+            <summary>
+            Write the specified message to the message display textbox on the UI form, keeping
+            the the text scrolled to the bottom so that the most recent entries are always visible.
+            </summary>
+            <param name="message"></param>
+        </member>
+        <member name="M:BioRad.Example_Application.MainForm.Log(System.String,System.String)">
+            <summary>
+            Log function
+            </summary>
+            <param name="logMessage"></param>
+            <param name="filename"></param>
+        </member>
+        <member name="M:BioRad.Example_Application.MainForm.MainForm_FormClosing(System.Object,System.Windows.Forms.FormClosingEventArgs)">
+            <summary>
+            The close box on the main form has been clicked. Stop the update status timer to avoid
+            any confusion during the clean-up operations. If the application was communicating with
+            an externally executing (UI visible) instance of CFX Manager, close the client connection,
+            which will unregister with the API service and allow other clients to connect to it. If
+            the application started CFX Manager in server (No UI) mode, then issue the ShutDown command
+            to properly close the CFX Manager instance. Not using ShutDown to close the CFX Manager
+            could lead to ghost processes on the host computer which would would prevent the further use 
+            of CFX Manager in any mode until host re-boot.
+            </summary>
+            <param name="sender"></param>
+            <param name="e"></param>
+        </member>
+        <member name="F:BioRad.Example_Application.MainForm.components">
+            <summary>
+            Required designer variable.
+            </summary>
+        </member>
+        <member name="M:BioRad.Example_Application.MainForm.Dispose(System.Boolean)">
+            <summary>
+            Clean up any resources being used.
+            </summary>
+            <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
+        </member>
+        <member name="M:BioRad.Example_Application.MainForm.InitializeComponent">
+            <summary>
+            Required method for Designer support - do not modify
+            the contents of this method with the code editor.
+            </summary>
+        </member>
+        <member name="T:BioRad.Example_Application.FormStartRun">
+            <summary>
+            Copyright ©2014 Bio-Rad Laboratories, Inc. All rights reserved.
+            
+            This class is part of the CFX Manager API Examples kit. 
+            
+            It implements a form that collects PCR run parameter information. It is used by the main form 
+            to collect parameter information prior to starting runs. 
+            </summary>
+        </member>
+        <member name="F:BioRad.Example_Application.FormStartRun.c_ProtocolFilter">
+            File dialog filter for protocol, LIMS, and PrimePCR files <remarks/>
+        </member>
+        <member name="F:BioRad.Example_Application.FormStartRun.c_PlateFilter">
+            File dialog filter for plate files <remarks/>
+        </member>
+        <member name="F:BioRad.Example_Application.FormStartRun.c_DataFilter">
+            File dialog filter for data files <remarks/>
+        </member>
+        <member name="F:BioRad.Example_Application.FormStartRun.c_ReportTemplateFilter">
+            File dialog filter for report template files <remarks/>
+        </member>
+        <member name="F:BioRad.Example_Application.FormStartRun.c_ProtocolExtension">
+            Protocol file extension <remarks/>
+        </member>
+        <member name="F:BioRad.Example_Application.FormStartRun.c_LIMSExtension">
+            LIMS file extension <remarks/>
+        </member>
+        <member name="F:BioRad.Example_Application.FormStartRun.c_PrimePCRExtension">
+            PrimePCR file extension <remarks/>
+        </member>
+        <member name="F:BioRad.Example_Application.FormStartRun.c_PlateExtension">
+            Plate file extension <remarks/>
+        </member>
+        <member name="F:BioRad.Example_Application.FormStartRun.c_DataExtension">
+            Data file extension <remarks/>
+        </member>
+        <member name="F:BioRad.Example_Application.FormStartRun.c_ReportExtension">
+            Report file extension <remarks/>
+        </member>
+        <member name="F:BioRad.Example_Application.FormStartRun.c_ReportTemplateExtension">
+            Report template file extension <remarks/>
+        </member>
+        <member name="F:BioRad.Example_Application.FormStartRun.m_serial_number">
+            <remarks>
+            The base serial number of the CFX system that the protocol is to be run on. This appears as part of the form
+            title, indicating which instrument the defined run will be started on.
+            </remarks>
+        </member>
+        <member name="M:BioRad.Example_Application.FormStartRun.#ctor">
+            <summary>
+            Initializes a new instance of the FormStartRun class. Calls the Designer required InitializeComponent().
+            Sets the content accessors to their default values, which will get loaded into the content of the various
+            controls by the form_load event handler.
+            </summary>
+        </member>
+        <member name="M:BioRad.Example_Application.FormStartRun.FormRunParams_Load(System.Object,System.EventArgs)">
+            <summary>
+            The Form_Load event handler. Populate the text of the various controls with the default content
+            that was set at construction. 
+            </summary>
+            <param name="sender"></param>
+            <param name="e"></param>
+        </member>
+        <member name="P:BioRad.Example_Application.FormStartRun.SerialNumber">
+            The base serial number of the CFXsystem that the protocol is to be run on<remarks/>
+        </member>
+        <member name="P:BioRad.Example_Application.FormStartRun.DataFile">
+            The fully qualified file name of the generated data file<remarks/>
+        </member>
+        <member name="P:BioRad.Example_Application.FormStartRun.ReportFile">
+            The fully qualified file name of the generated report file, when applicable<remarks/>
+        </member>
+        <member name="P:BioRad.Example_Application.FormStartRun.ProtocolFile">
+            The protocol, LIMS, or PrimePCR file to be run<remarks/>
+        </member>
+        <member name="P:BioRad.Example_Application.FormStartRun.PlateFile">
+            The plate file to be used when the protocol file is a real-time .pcrd file<remarks/>
+        </member>
+        <member name="P:BioRad.Example_Application.FormStartRun.DataFileFolder">
+            The directory to which the generated data file is written<remarks/>
+        </member>
+        <member name="P:BioRad.Example_Application.FormStartRun.OutputFileName">
+            The file name (no path or extension) of the generated data and report files <remarks/>
+        </member>
+        <member name="P:BioRad.Example_Application.FormStartRun.Notes">
+            Text to appear as "Notes" in the generated data file <remarks/>
+        </member>
+        <member name="P:BioRad.Example_Application.FormStartRun.RunID">
+            Text to appear as "ID/Bar Code" in the generated data file <remarks/>
+        </member>
+        <member name="P:BioRad.Example_Application.FormStartRun.GenerateReport">
+            If true, a PDF report will automatically be generated at the end of the run<remarks/>
+        </member>
+        <member name="P:BioRad.Example_Application.FormStartRun.UseDefaultReportTemplate">
+            If true, reports will be generated using the CFX Manager default report template.<remarks/>
+        </member>
+        <member name="P:BioRad.Example_Application.FormStartRun.ReportFolder">
+            The directory to which the generated report file is written.<remarks/>
+        </member>
+        <member name="P:BioRad.Example_Application.FormStartRun.ReportTemplate">
+            The fully qualified file name of the report template to be used to generate reports, when not using the default template<remarks/>
+        </member>
+        <member name="P:BioRad.Example_Application.FormStartRun.EmailResults">
+            If true, generated data and report files will be Emailed to  specified recipients after the run<remarks/>
+        </member>
+        <member name="P:BioRad.Example_Application.FormStartRun.EmailRecipients">
+            Comma separated list of Email addresses that generated data and report files will be Emailed to. <remarks/>
+        </member>
+        <member name="M:BioRad.Example_Application.FormStartRun.SelectFile(System.String,System.String)">
+            <summary>
+            Utility used by the file selection button event handlers. Presents a file
+            selection dialog using the specified title and file type filter, and returns the
+            selected file.
+            </summary>
+            <param name="filter"></param>
+            <param name="title"></param>
+            <returns>The selected file, or the empty string if selection was cancelled.</returns>
+        </member>
+        <member name="M:BioRad.Example_Application.FormStartRun.SelectFolder">
+            <summary>
+            Utility used by the directory selection button event handlers. Presents a directory
+            selection dialog and returns the selected directory.
+            </summary>
+            <returns>The selected directory, or null if the selection was cancelled</returns>
+        </member>
+        <member name="M:BioRad.Example_Application.FormStartRun.LoadParamsFromForm">
+            <summary>
+            Load the current values of the various form controls into the content accessors for use by the Main Form.
+            Triggered when the Start Run button is clicked. Performs some basic content validation.
+            </summary>
+            <returns>true if content validation succeeds. false if content validation fails.</returns>
+        </member>
+        <member name="M:BioRad.Example_Application.FormStartRun.m_button_protocol_Click(System.Object,System.EventArgs)">
+            Protocol File button was clicked.<summary/>
+        </member>
+        <member name="M:BioRad.Example_Application.FormStartRun.m_button_plate_Click(System.Object,System.EventArgs)">
+            Plate File button was clicked.<summary/>
+        </member>
+        <member name="M:BioRad.Example_Application.FormStartRun.m_button_datafile_folder_Click(System.Object,System.EventArgs)">
+            Data File Folder button was clicked.<summary/>
+        </member>
+        <member name="M:BioRad.Example_Application.FormStartRun.m_button_report_folder_Click(System.Object,System.EventArgs)">
+            Report Folder button was clicked.<summary/>
+        </member>
+        <member name="M:BioRad.Example_Application.FormStartRun.m_button_report_tmplate_Click(System.Object,System.EventArgs)">
+            Report template button was clicked.<summary/>
+        </member>
+        <member name="M:BioRad.Example_Application.FormStartRun.m_button_StartRun_Click(System.Object,System.EventArgs)">
+            <summary>
+            Start Run button was clicked. If the content is valid, click the hidden m_button_dialog_OK  which
+            will return a dialog result of OK to the main form.
+            <summary/>
+            </summary>
+            <param name="sender"></param>
+            <param name="e"></param>
+        </member>
+        <member name="M:BioRad.Example_Application.FormStartRun.m_button_dialog_OK_Click(System.Object,System.EventArgs)">
+            <summary>
+            The hidden m_button_dialog_OK was clicked (by the m_button_StartRun_Click handler). This will cause a 
+            dialog result of OK to be returned to the main form. Hide this form.
+            </summary>
+            <param name="sender"></param>
+            <param name="e"></param>
+        </member>
+        <member name="F:BioRad.Example_Application.FormStartRun.components">
+            <summary>
+            Required designer variable.
+            </summary>
+        </member>
+        <member name="M:BioRad.Example_Application.FormStartRun.Dispose(System.Boolean)">
+            <summary>
+            Clean up any resources being used.
+            </summary>
+            <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
+        </member>
+        <member name="M:BioRad.Example_Application.FormStartRun.InitializeComponent">
+            <summary>
+            Required method for Designer support - do not modify
+            the contents of this method with the code editor.
+            </summary>
+        </member>
+        <member name="T:BioRad.Example_Application.Program">
+             <summary>
+            Copyright ©2014 Bio-Rad Laboratories, Inc. All rights reserved.
+            
+            This class is part of the CFX Manager API Examples kit. 
+            
+            It implements the main execution thread (entry point) of the example application. 
+            Start the MainForm and handle and log any un-caught exceptions up to maximum number,
+            above which exit the application.
+            </summary>
+        </member>
+        <member name="F:BioRad.Example_Application.Program.m_main_form">
+            The Example Application Main Form<Remarks/>
+        </member>
+        <member name="F:BioRad.Example_Application.Program.m_unhandled_exception_count">
+            Counter used to ensure the application exits after catching more than a maximum number of unhandled exceptions<Remarks/>
+        </member>
+        <member name="F:BioRad.Example_Application.Program.m_max_unhandled_exceptions">
+            The maximum number of unhandled exceptions that can be caught before the program will force itself to exit<Remarks/>
+        </member>
+        <member name="F:BioRad.Example_Application.Program.m_app_domain_exception_handler">
+            The  unhandled AppDomain exception handler<Remarks/>
+        </member>
+        <member name="F:BioRad.Example_Application.Program.m_thread_exception_handler">
+            The  unhandled Thread exception handler<Remarks/>
+        </member>
+        <member name="M:BioRad.Example_Application.Program.Main(System.String[])">
+             <summary>
+            main entry point 
+             </summary>
+        </member>
+        <member name="M:BioRad.Example_Application.Program.LogExceptionAndExit(System.Exception)">
+            <summary>
+            Handles otherwise unhandled exceptions by logging the exception up to m_max_unhandled_exceptions times.
+            Exits the application at the (m_max_unhandled_exceptions)+1-th exception.
+            </summary>
+            <param name="ex">the exception</param>
+        </member>
+        <member name="M:BioRad.Example_Application.Program.OnAppDomainException(System.Object,System.UnhandledExceptionEventArgs)">
+            <summary>
+            Handles AppDomain.UnhandledException events
+            </summary>
+            <param name="sender"></param>
+            <param name="e"></param>
+        </member>
+        <member name="M:BioRad.Example_Application.Program.OnThreadException(System.Object,System.Threading.ThreadExceptionEventArgs)">
+            <summary>
+            Handles Application.ThreadExcpetion events
+            </summary>
+            <param name="sender"></param>
+            <param name="e"></param>
+        </member>
+    </members>
+</doc>
