@@ -17,6 +17,12 @@ namespace BioRad.Example_Client
     /// </summary>
     public static class CFXManagerClient
     {
+        #region constants
+        /// Position for logs
+        const string c_log_folder = "C:\\PCR_BioRad\\log\\";
+        static string log_filename = DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss") + "_log.txt";
+        #endregion
+
         #region call-back place-holder
 
         /// <summary>
@@ -43,7 +49,7 @@ namespace BioRad.Example_Client
         /// <param name="filename"></param>
         private static void Log(string logMessage, string filename = "log.txt")
         {
-            using (StreamWriter w = File.AppendText(filename))
+            using (StreamWriter w = File.AppendText(c_log_folder + filename))
             {
                 w.Write("\r\nLog Entry : ");
                 w.WriteLine($"{DateTime.Now.ToLongTimeString()} {DateTime.Now.ToLongDateString()}");
@@ -129,9 +135,9 @@ namespace BioRad.Example_Client
         {
             string ret;
             
-            Log(String.Format("Sending request {0}: {1}", id, request));
+            Log(String.Format("Sending request {0}: {1}", id, request), log_filename);
             ret = m_Client.XmlCommand(request);
-            Log(String.Format("Got answer {0}: {1}", id, ret));
+            Log(String.Format("Got answer {0}: {1}", id, ret), log_filename);
             id++;
             return ret;
         }

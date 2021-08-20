@@ -53,6 +53,9 @@ namespace BioRad.Example_Application
         ///The interval in milliseconds at which to fire the system timer when attempting to reconnect to the service<remarks/>
         protected const double c_connect_retry_interval = 5000.00;
 
+        /// Position for logs
+        protected static string c_log_folder = "C:\\PCR_BioRad\\log\\";
+
         #endregion
 
         #region Member Data
@@ -239,13 +242,13 @@ namespace BioRad.Example_Application
         /// <param name="e"></param>
         private void UpdateTimer_Elapsed(object sender, EventArgs e)
         {
-            Log("Timer elapsed on thread: " + Thread.CurrentThread.ManagedThreadId);
+            Log("Timer elapsed on thread: " + Thread.CurrentThread.ManagedThreadId, ui_log_filename);
             lock (m_update_status_lock)
             {
                 if (!m_update_status_running)
                 {
                     m_update_status_running = true;
-                    Log("Entered :-)");
+                    Log("Entered :-)", ui_log_filename);
                     // Do not process events that arrive after the timer has been disabled
                     if (m_status_update_timer.Enabled)
                     {
@@ -280,7 +283,7 @@ namespace BioRad.Example_Application
                     }
                     while (action_queue.Count > 0)
                     {
-                        Log("Dequeing!! Count = " + action_queue.Count);
+                        Log("Dequeing!! Count = " + action_queue.Count, ui_log_filename);
                         var action = action_queue.Dequeue();
                         switch (action)
                         {
@@ -292,11 +295,11 @@ namespace BioRad.Example_Application
                         }
                     }
                     m_update_status_running = false;
-                    Log("Timer ended!");
+                    Log("Timer ended!", ui_log_filename);
                 }
                 else
                 {
-                    Log("Skipped!");
+                    Log("Skipped!", ui_log_filename);
                 }
             }
         }
@@ -695,14 +698,14 @@ namespace BioRad.Example_Application
         private void m_button_RunProtocol_Click(object sender, EventArgs e)
         {
             action_queue.Enqueue("RunProtocol");
-            Log("RunProtocol Enqueued!");
+            Log("RunProtocol Enqueued!", ui_log_filename);
         }
 
         private void RunProtocol()
         {
             lock (m_update_status_lock)
             {
-                Log("Run protocol entered :-)");
+                Log("Run protocol entered :-)", ui_log_filename);
                 //Turn off timer-triggered status updates during the operation(s)
                 m_OP_InProgress = true;
                 if (!AnyInstrumentsSelected())
@@ -742,7 +745,7 @@ namespace BioRad.Example_Application
                 }
                 m_OP_InProgress = false;
             }
-            Log("RunProtocol ended!");
+            Log("RunProtocol ended!", ui_log_filename);
         }
 
         /// <summary>
@@ -848,7 +851,7 @@ namespace BioRad.Example_Application
         {
             if (filename != "")
             {
-                using (StreamWriter w = File.AppendText(filename))
+                using (StreamWriter w = File.AppendText(c_log_folder + filename))
                 {
                     w.Write("\r\nLog Entry : ");
                     w.WriteLine($"{DateTime.Now.ToLongTimeString()} {DateTime.Now.ToLongDateString()}");
