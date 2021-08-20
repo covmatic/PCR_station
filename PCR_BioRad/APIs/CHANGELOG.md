@@ -1,8 +1,16 @@
 # PCR API for Biorad CFX Maestro
 
+## v1.7.1 2021-08-20
+### Added
+- logs are saved to folder with a date-time filename;
+- print version in the main window
+
+### Fixed
+- loggers use try-catch.
+
 ## v1.6.2 2021-08-19
 ### Fixed
-- Inserted queue for not overlapping status update while sending protocol.
+- RunProtocol is enqueued and executed in timer function.
 
 ## v1.6.1 2021-08-18
 ### Fixed

@@ -1,0 +1,45 @@
+
+Log Entry : 18:18:47 giovedì 19 agosto 2021
+  :
+  :Bio-Rad CFX Manager API Example Application is initializing..
+-------------------------------
+
+Log Entry : 18:18:47 giovedì 19 agosto 2021
+  :
+  :Starting CFX Manager in server mode..
+-------------------------------
+
+Log Entry : 18:18:50 giovedì 19 agosto 2021
+  :
+  :Client connection established with CFX Manager API service..
+-------------------------------
+
+Log Entry : 18:18:51 giovedì 19 agosto 2021
+  :
+  :Instrument SIM67552 has been detected.
+-------------------------------
+
+Log Entry : 18:18:52 giovedì 19 agosto 2021
+  :
+  :The status of instrument SIM67552 has changed from Synchronizing to Idle
+-------------------------------
+
+Log Entry : 18:21:10 giovedì 19 agosto 2021
+  :
+  :RunProtocol Enqueued!
+-------------------------------
+
+Log Entry : 18:21:11 giovedì 19 agosto 2021
+  :
+  :Run Protocol click on thread: 1
+-------------------------------
+
+Log Entry : 18:21:11 giovedì 19 agosto 2021
+  :
+  :Run protocol entered :-)
+-------------------------------
+
+Log Entry : 18:21:48 giovedì 19 agosto 2021
+  :
+  :RunProtocol ended!
+-------------------------------
