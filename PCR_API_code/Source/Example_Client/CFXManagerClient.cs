@@ -49,13 +49,20 @@ namespace BioRad.Example_Client
         /// <param name="filename"></param>
         private static void Log(string logMessage, string filename = "log.txt")
         {
-            using (StreamWriter w = File.AppendText(c_log_folder + filename))
+            try
             {
-                w.Write("\r\nLog Entry : ");
-                w.WriteLine($"{DateTime.Now.ToLongTimeString()} {DateTime.Now.ToLongDateString()}");
-                w.WriteLine("  :");
-                w.WriteLine($"  :{logMessage}");
-                w.WriteLine("-------------------------------");
+                using (StreamWriter w = File.AppendText(c_log_folder + filename))
+                {
+                    w.Write("\r\nLog Entry : ");
+                    w.WriteLine($"{DateTime.Now.ToLongTimeString()} {DateTime.Now.ToLongDateString()}");
+                    w.WriteLine("  :");
+                    w.WriteLine($"  :{logMessage}");
+                    w.WriteLine("-------------------------------");
+                }
+            }
+            catch
+            {
+
             }
         }
 

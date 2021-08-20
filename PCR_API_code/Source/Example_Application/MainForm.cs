@@ -180,6 +180,7 @@ namespace BioRad.Example_Application
             // InitializeMainForm() Entry Point
             this.Text = string.Format(c_app_name);
             LogNewLine(string.Format("{0} is initializing..", c_app_name));
+            LogNewLine(string.Format("Version {0}", getVersion()));
             m_ClientWrapper.ClientError += HandleClientError;
             if (ReadyCFXManager())
             {
@@ -204,6 +205,14 @@ namespace BioRad.Example_Application
                   MessageBoxDefaultButton.Button1);
                 Close();
             }
+        }
+
+        private object getVersion()
+        {
+            System.Reflection.Assembly assembly = System.Reflection.Assembly.GetExecutingAssembly();
+            System.Diagnostics.FileVersionInfo fvi = System.Diagnostics.FileVersionInfo.GetVersionInfo(assembly.Location);
+            string version = fvi.FileVersion;
+            return version;
         }
 
         #endregion
@@ -849,16 +858,24 @@ namespace BioRad.Example_Application
         /// <param name="filename"></param>
         private static void Log(string logMessage, string filename = "log_ui.txt")
         {
-            if (filename != "")
+            try
             {
-                using (StreamWriter w = File.AppendText(c_log_folder + filename))
+
+                if (filename != "")
                 {
-                    w.Write("\r\nLog Entry : ");
-                    w.WriteLine($"{DateTime.Now.ToLongTimeString()} {DateTime.Now.ToLongDateString()}");
-                    w.WriteLine("  :");
-                    w.WriteLine($"  :{logMessage}");
-                    w.WriteLine("-------------------------------");
+                    using (StreamWriter w = File.AppendText(c_log_folder + filename))
+                    {
+                        w.Write("\r\nLog Entry : ");
+                        w.WriteLine($"{DateTime.Now.ToLongTimeString()} {DateTime.Now.ToLongDateString()}");
+                        w.WriteLine("  :");
+                        w.WriteLine($"  :{logMessage}");
+                        w.WriteLine("-------------------------------");
+                    }
                 }
+            }
+            catch
+            {
+                
             }
         }
 
