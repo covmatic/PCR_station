@@ -54,10 +54,7 @@ namespace BioRad.Example_Client
                 using (StreamWriter w = File.AppendText(c_log_folder + filename))
                 {
                     w.Write("\r\nLog Entry : ");
-                    w.WriteLine($"{DateTime.Now.ToLongTimeString()} {DateTime.Now.ToLongDateString()}");
-                    w.WriteLine("  :");
-                    w.WriteLine($"  :{logMessage}");
-                    w.WriteLine("-------------------------------");
+                    w.WriteLine($"{DateTime.Now.ToLongTimeString()} {DateTime.Now.ToLongDateString()}: {logMessage}");
                 }
             }
             catch
@@ -87,7 +84,7 @@ namespace BioRad.Example_Client
         /// </param>
         public static void SetResponseTimeOut(int time_out_seconds)
         {
-            Log("Timeout set to: " + time_out_seconds);
+            Log("Timeout set to: " + time_out_seconds, log_filename);
             m_Client.InnerChannel.OperationTimeout = TimeSpan.FromSeconds(time_out_seconds);
         }
 

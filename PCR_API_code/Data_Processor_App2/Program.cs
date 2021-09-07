@@ -261,6 +261,14 @@ namespace PCR_Data_Processor
 
         public static Logger logger = new Logger();
 
+        public static bool AreFilesMissing(string outputFileName)
+        {
+            string fileNameSubstring = outputFileName + " -  Quantification Amplification*.csv";
+            string[] ampliFiles = Directory.GetFiles(csvFilesFolder, fileNameSubstring);
+
+            return ampliFiles.Length==0;
+        }
+
         public static void process_data(string PCRserial, string outputFileName)
         {
             bool hexCheck = false, famCheck = false, roxCheck = false, cy5Check = false, cr610Check = false, qua670Check = false;
@@ -287,7 +295,7 @@ namespace PCR_Data_Processor
                     qua670Check = true;
             }
 
-            logger.Log(String.Format("Hex: {0}, FAM: {1}, ROX: {2}, Cy5: {3}, Cal Red 610: {4}, Quasar 670: {5}", hexCheck, famCheck, roxCheck, cr610Check, qua670Check));
+            logger.Log(String.Format("Hex: {0}, FAM: {1}, ROX: {2}, Cy5: {3}, Cal Red 610: {4}, Quasar 670: {5}", hexCheck, famCheck, roxCheck, cy5Check, cr610Check, qua670Check));
 
             // Setting culture info for reading numbers correctly with the Convert class
             CultureInfo.CurrentCulture = CultureInfo.InvariantCulture;

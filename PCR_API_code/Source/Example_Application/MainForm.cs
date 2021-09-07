@@ -511,10 +511,26 @@ namespace BioRad.Example_Application
          
                                 var t = Task.Run(async delegate
                                 {
-                                    await Task.Delay(60000);    // API Spec says it can take up to a minute to process data
+                                    int count = 0, max_count = 60;  // API Spec says it can take up to a minute to process data
+                                    while (DataProcess.AreFilesMissing(outputFileName) && (count < max_count))
+                                    {
+                                        await Task.Delay(1000);
+
+                                        count++;
+                                    }
+                                    if(count < max_count)
+                                    {
+                                        LogNewLine(String.Format("Data became available in {0} seconds", count));
+                                    }
+                                    else
+                                    {
+                                        LogNewLine("Max waiting time reached.");
+                                    }
+                                    await Task.Delay(5000);
                                     return 0;
                                 });
-                                LogNewLine("Waiting for the data to became available... (1 minute)");
+
+                                LogNewLine("Waiting for the data to became available...");
                                 t.Wait();// wait to allow the PCR to process the data and produce CSV files
                                 DataProcess.process_data(PCRserial, outputFileName); //Call the Data Processor to read the CSV files generated
                                 m_ClientWrapper.ShutDown(); //Disconnect the PCR from the API Client

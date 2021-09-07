@@ -64,6 +64,8 @@ namespace BioRad.Example_Client_Wrapper
         private static ShutDownType m_ShutDown_Item = new ShutDownType();
         private static QueryInstrumentBlocksType m_InstrumentStatus_Item = new QueryInstrumentBlocksType();
 
+        private static int m_RunProtocol_Timeout = 30;      // [s] Timeout for the communication channel
+
         #endregion
 
         #region Schema object wrappers
@@ -706,6 +708,7 @@ namespace BioRad.Example_Client_Wrapper
                 m_RunProtocol_Item.EmailAddresses = EmailAddresses;
                 m_RunProtocol_Item.GenerateReportType = ReportTypes.pdf;
                 m_MasterMessage.Item = m_RunProtocol_Item;
+                CFXManagerClient.SetResponseTimeOut(m_RunProtocol_Timeout);
                 return BlocksType2StatusList(XML2BlocksType(CFXManagerClient.SendServiceRequest(Message2XML(m_MasterMessage))));
             }
             catch (Exception ex)

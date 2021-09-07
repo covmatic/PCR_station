@@ -1,5 +1,13 @@
 # PCR API for Biorad CFX Maestro
 
+## v1.7.4 2021-09-07
+### Fixed
+- Application looks for csv results instead of waiting for one minute
+
+## v1.7.3 2021-09-07
+### Fixed
+- timeout set to 30s trying to solve RunProtocol start problem
+
 ## v1.7.2 2021-09-07
 ### Added
 - some logs are printed also by Data Processor Application
