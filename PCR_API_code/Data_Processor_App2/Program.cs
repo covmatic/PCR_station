@@ -209,6 +209,37 @@ namespace PCR_Data_Processor
         }
     }
 
+    public class Logger
+    {
+        /// Position for logs
+        protected static string c_log_folder = "C:\\PCR_BioRad\\log\\";
+        static string analysis_log_filename = "";
+
+        public Logger()
+        {
+           analysis_log_filename = DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss") + "_log_analysis.txt";
+        }
+
+        /// <summary>
+        /// Log function
+        /// </summary>
+        /// <param name="logMessage"></param>
+        /// <param name="filename"></param>
+        public void Log(string logMessage)
+        {
+            try
+            {
+                using (StreamWriter w = File.AppendText(c_log_folder + analysis_log_filename))
+                {
+                    w.WriteLine($"{DateTime.Now.ToLongTimeString()} {DateTime.Now.ToLongDateString()}: {logMessage}");
+                }
+            }
+            catch
+            {
+
+            }
+        }
+    }
 
     public class DataProcess //THIS IS THE FUNCTION THAT IS CALLED FROM MainForm.cs
     {
@@ -227,14 +258,21 @@ namespace PCR_Data_Processor
                                                                   @"C:\Utenti\Bio-Rad\OneDrive\Desktop\BIO RAD\TEST RESULTS"};
                                                                   // HERE IS A LIST OF ONE-DRIVE DIRECTORIES FOR SAVING THE .pcrd FILES
 
+
+        public static Logger logger = new Logger();
+
         public static void process_data(string PCRserial, string outputFileName)
         {
             bool hexCheck = false, famCheck = false, roxCheck = false, cy5Check = false, cr610Check = false, qua670Check = false;
+
+            logger.Log(String.Format("Starting process data for PCR {0} and output filename {1}", PCRserial, outputFileName));
             string fileNameSubstring = outputFileName + " -  Quantification Amplification*.csv";
             string[] ampliFiles = Directory.GetFiles(csvFilesFolder, fileNameSubstring);
+            logger.Log(String.Format("Found {0} files", ampliFiles.Length));
 
             for (int i = 0; i < ampliFiles.Length; i++)
             {
+                logger.Log(String.Format("Processing file: {0}", ampliFiles[i]));
                 if (ampliFiles[i].IndexOf("HEX") != -1)
                     hexCheck = true;
                 if (ampliFiles[i].IndexOf("FAM") != -1)
@@ -248,6 +286,8 @@ namespace PCR_Data_Processor
                 if (ampliFiles[i].IndexOf("Quasar 670") != -1)
                     qua670Check = true;
             }
+
+            logger.Log(String.Format("Hex: {0}, FAM: {1}, ROX: {2}, Cy5: {3}, Cal Red 610: {4}, Quasar 670: {5}", hexCheck, famCheck, roxCheck, cr610Check, qua670Check));
 
             // Setting culture info for reading numbers correctly with the Convert class
             CultureInfo.CurrentCulture = CultureInfo.InvariantCulture;
@@ -265,6 +305,7 @@ namespace PCR_Data_Processor
 
         public static void copy_to_OneDrive(string PCRserial, string outputFileName) // FUNCTION FOR COPYING THE .pcrd FILES TO A ONE-DRIVE FOLDER
         {
+            logger.Log("Copying to OneDrive.");
             string pcrdFileName = outputFileName + ".pcrd";
             string sourceFilePath = Path.Combine(pcrdResultFolder, pcrdFileName);
             string targetFolder = string.Empty;
@@ -295,6 +336,7 @@ namespace PCR_Data_Processor
 
         static void process_data_PrimerDesign(string PCRserial, string outputFileName)
         {
+            logger.Log(String.Format("process data for PrimerDesign with PCRSerial {0} and outputFileName {1}", PCRserial, outputFileName));
             Data_PrimerDesign pcrRunData;
             int numCycles, numWells, count = 0, count1 = 0, NECindex = 0, PCTindex = 9;
             float tf1, tf2;
@@ -534,6 +576,7 @@ namespace PCR_Data_Processor
 
         static void process_data_AllPlex(string PCRserial, string outputFileName)
         {
+            logger.Log(String.Format("process data for AllPlex with PCRSerial {0} and outputFileName {1}", PCRserial, outputFileName));
             Data_AllPlex pcrRunData;
             int numCycles, numWells, count = 0, count1 = 0, count2 = 0, count3 = 0, NECindex = 0, PCTindex = 9;
             float tf1, tf2, tf3;
@@ -909,6 +952,7 @@ namespace PCR_Data_Processor
 
         static void process_data_KHB(string PCRserial, string outputFileName)
         {
+            logger.Log(String.Format("process data for KHB with PCRSerial {0} and outputFileName {1}", PCRserial, outputFileName));
             Data_KHB pcrRunData;
             int numCycles, numWells, count = 0, count1 = 0, count2 = 0, count3 = 0, NECindex = 0, PCTindex = 9;
             float tf1, tf2, tf3;
@@ -1275,13 +1319,14 @@ namespace PCR_Data_Processor
 
 
             //WRITING THE JSON FILE - START ------------------------------------------------------------------------------
+            logger.Log(String.Format("Writing Json to {0}", jsonResultFilePath));
             jsonText = JsonConvert.SerializeObject(pcrRunData, Formatting.Indented);
             File.WriteAllText(jsonResultFilePath, jsonText, Encoding.UTF8);
             //WRITING THE JSON FILE - END --------------------------------------------------------------------------------
 
-
             //DELETING THE CSV FILES AND CLEARING THE TABLES - START -----------------------------------------------------
             string[] filePaths = Directory.GetFiles(csvFilesFolder, "*.csv");
+            logger.Log(String.Format("KHB Analysis completed, cleaning {0} files in csv folder", filePaths.Length));
             for (int i = 0; i < filePaths.Length; i++)
                 File.Delete(filePaths[i]);
             Cy5table.Clear();
@@ -1299,4 +1344,5 @@ namespace PCR_Data_Processor
         {
         }
     }
+
 }

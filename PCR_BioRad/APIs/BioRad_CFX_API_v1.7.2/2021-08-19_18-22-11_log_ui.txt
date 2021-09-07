@@ -1,0 +1,75 @@
+
+Log Entry : 18:22:11 giovedì 19 agosto 2021
+  :
+  :Bio-Rad CFX Manager API Example Application is initializing..
+-------------------------------
+
+Log Entry : 18:22:11 giovedì 19 agosto 2021
+  :
+  :Starting CFX Manager in server mode..
+-------------------------------
+
+Log Entry : 18:22:15 giovedì 19 agosto 2021
+  :
+  :Client connection established with CFX Manager API service..
+-------------------------------
+
+Log Entry : 18:22:16 giovedì 19 agosto 2021
+  :
+  :Instrument SIM67552 has been detected.
+-------------------------------
+
+Log Entry : 18:22:17 giovedì 19 agosto 2021
+  :
+  :The status of instrument SIM67552 has changed from Synchronizing to Idle
+-------------------------------
+
+Log Entry : 18:27:23 giovedì 19 agosto 2021
+  :
+  :Sending request Blink to CFX system SIM67552...
+-------------------------------
+
+Log Entry : 18:27:28 giovedì 19 agosto 2021
+  :
+  :Sending request OpenLid to CFX system SIM67552...
+-------------------------------
+
+Log Entry : 18:27:31 giovedì 19 agosto 2021
+  :
+  :The status of instrument SIM67552 has changed from Idle to LidOpen
+-------------------------------
+
+Log Entry : 18:27:33 giovedì 19 agosto 2021
+  :
+  :Sending request CloseLid to CFX system SIM67552...
+-------------------------------
+
+Log Entry : 18:27:36 giovedì 19 agosto 2021
+  :
+  :The status of instrument SIM67552 has changed from LidOpen to Idle
+-------------------------------
+
+Log Entry : 18:27:48 giovedì 19 agosto 2021
+  :
+  :Sending RunProtocol to CFX system SIM67552...
+-------------------------------
+
+Log Entry : 18:27:50 giovedì 19 agosto 2021
+  :
+  :A protocol has begun running on instrument SIM67552
+-------------------------------
+
+Log Entry : 18:30:52 giovedì 19 agosto 2021
+  :
+  :A protocol has finished running on instrument SIM67552, which is currently processing the data.
+-------------------------------
+
+Log Entry : 18:30:54 giovedì 19 agosto 2021
+  :
+  :Instrument SIM67552 has completed processing the data from a completed protocol run.
+-------------------------------
+
+Log Entry : 18:30:54 giovedì 19 agosto 2021
+  :
+  :Waiting for the data to became available... (1 minute)
+-------------------------------
