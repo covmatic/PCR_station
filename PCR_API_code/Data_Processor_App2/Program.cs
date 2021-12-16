@@ -30,6 +30,12 @@ namespace PCR_Data_Processor
         // Set all the samples to "Inconclusive" if at least one
         // of the positive control or negative control fails
         public const bool SetInconclusiveIfControlsFail = false;
+
+        // Samples Thresholds
+        public const int famRFUThreshold = 1000;
+        public const int roxRFUThreshold = 1000;
+        public const int cy5RFUThreshold = 1000;
+
     }
 
     class Data_PrimerDesign
@@ -1295,11 +1301,11 @@ namespace PCR_Data_Processor
                 {
                     count1 = 0;
                     if (aWell.cy5Cq != "NaN")
-                        if (aWell.cy5RFU_endpoint >= 1000) ++count1;
+                        if (aWell.cy5RFU_endpoint >= AnalysisSettings.cy5RFUThreshold) ++count1;
                     if (aWell.famCq != "NaN")
-                        if (aWell.famRFU_endpoint >= 1000) ++count1;
+                        if (aWell.famRFU_endpoint >= AnalysisSettings.famRFUThreshold) ++count1;
                     if (aWell.roxCq != "NaN")
-                        if (aWell.roxRFU_endpoint >= 1000) ++count1;
+                        if (aWell.roxRFU_endpoint >= AnalysisSettings.roxRFUThreshold) ++count1;
                     switch (count1)
                     {
                         case 0:
