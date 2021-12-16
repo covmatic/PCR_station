@@ -32,9 +32,9 @@ namespace PCR_Data_Processor
         public const bool SetInconclusiveIfControlsFail = false;
 
         // Samples Thresholds
-        public const int famRFUThreshold = 1000;
-        public const int roxRFUThreshold = 1000;
-        public const int cy5RFUThreshold = 1000;
+        public const int famRFUThreshold = 1500;
+        public const int roxRFUThreshold = 1500;
+        public const int cy5RFUThreshold = 1500;
 
     }
 
