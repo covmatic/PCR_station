@@ -1,5 +1,6 @@
 
-SET APIDIR=BioRad_CFX_API_v1.7.4
+SET APIDIR=BioRad_CFX_API_v1.7.5
+SET TOOLSDIR=DataProcessorApplication_v1.8
 
 SET APIPATH=C:\PCR_BioRad
 SET LOGDIR=log
@@ -9,6 +10,7 @@ SET LOGDIR=log
 echo Copying files for directory %APIDIR% to path %APIPATH%
 pause
 xcopy %APIDIR% %APIPATH%\APIs\%APIDIR% /y /e /i
+xcopy %TOOLSDIR% %APIPATH%\tools\%TOOLSDIR% /y /e /i
 xcopy Changelog.md C:\PCR_BioRad\APIs\   /y 
 
 echo Checking log directory

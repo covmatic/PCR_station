@@ -1,5 +1,9 @@
 # PCR API for Biorad CFX Maestro
 
+## v1.7.5 2021-12-16
+### Fixed
+- Increased FAM, ROX and Cy5 thresholds to 1500
+
 ## v1.7.4 2021-09-07
 ### Fixed
 - Application looks for csv results instead of waiting for one minute
