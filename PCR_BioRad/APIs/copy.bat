@@ -1,6 +1,6 @@
 
-SET APIDIR=BioRad_CFX_API_v1.7.5
-SET TOOLSDIR=DataProcessorApplication_v1.8
+SET APIDIR=BioRad_CFX_API_v1.7.6
+SET TOOLSDIR=DataProcessorApplication_v1.9
 
 SET APIPATH=C:\PCR_BioRad
 SET LOGDIR=log
